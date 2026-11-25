@@ -10,6 +10,30 @@ GRANA is a personal finance PWA (Brazil, BRL) replacing spreadsheets, with a sha
 - **Tests:** Vitest for domain logic; pgTAP or SQL tests for RLS and database functions when relevant.
 - **Hosting:** static deploy (Vercel / Cloudflare Pages). Must fit Supabase free tier.
 
+## Commands
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Dev server on http://localhost:3000 (port matches `auth.site_url` in `supabase/config.jsonc`). |
+| `npm run build` | Typecheck + production build (with service worker). |
+| `npm run typecheck` / `npm run lint` / `npm test` | TypeScript, oxlint, Vitest. |
+| `npx supabase migration new <name>` | New migration in `supabase/migrations/`. |
+| `npx supabase db push` | Apply migrations to the linked remote project. |
+| `npm run db:types` | Regenerate `src/lib/database.types.ts` (local stack). |
+
+Env: copy `.env.example` to `.env.local` (`VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`).
+
+## Project layout
+
+- `src/app/` — router and app shell. `src/features/<feature>/` — pages, hooks and schemas per feature (auth, home, …).
+- `src/domain/` — pure business rules + tests. `src/lib/` — Supabase client, DB types, utils. `src/components/ui/` — shadcn (generated; add with `npx shadcn add <name>`).
+- Routes and UI copy are pt-BR (`/entrar`, `/cadastro`, `/recuperar-senha`, `/redefinir-senha`).
+
+## Git
+
+- Commits authored by the user only — **no `Co-Authored-By` / Claude attribution** in commits or PRs.
+- Split commits by category with conventional prefixes: `chore(setup)`, `feat(db)`, `feat(auth)`, `feat(frontend)`, `feat(domain)`, `test(...)`, `docs`, `feat(money)`…
+
 ## Conventions
 
 - **Code in English** (tables, columns, variables, files). **UI text in pt-BR.**
@@ -25,7 +49,7 @@ GRANA is a personal finance PWA (Brazil, BRL) replacing spreadsheets, with a sha
 
 | Table | Purpose |
 |---|---|
-| `profiles` | User settings, incl. `financial_month_start_day` (default 1; owner uses 26). |
+| `profiles` | User settings, incl. `financial_month_start_day` (1–28, default 1; owner uses 26). |
 | `accounts` | `type`: `checking` \| `wallet` \| `credit_card`. Cards have `closing_day`, `due_day`, `default_payment_account_id`, optional `credit_limit`. `initial_balance`. |
 | `categories` | `kind`: `income` \| `expense`. Name, color, icon. No subcategories. |
 | `transactions` | `type`: `income` \| `expense` \| `transfer`. `amount` (cents, positive), `date`, `account_id`, `to_account_id` (transfers), `category_id`, `payment_method` (`cash` \| `debit` \| `credit` \| `pix`), `invoice_id`, `purchase_id` + `installment_number`/`installment_count`, `recurring_id`, `shared_expense_id`. |
